@@ -12,7 +12,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
     // Check if there are any arguments
     if (argc == 1) {
-        cout << "wcat: file1 [file2 ...]" << endl;
+        //cout << "wcat: file1 [file2 ...]" << endl;
         return 0;
     }
 
@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
         int verify = open(argv[i], O_RDONLY);
         // check if open was successful
         if(verify < 0){
-            cerr << "wcat: cannot open file" << endl;
+            cout << "wcat: cannot open file" << endl;
             return 1;
         }
         // read & print the file
