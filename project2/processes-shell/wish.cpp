@@ -9,7 +9,12 @@
 
 using namespace std;
 
+
+
 int main(int argc, char* argv[]){
+    vector<string> paths;
+    
+
     if(argc == 1){
         //no arguments, boot into interactive mode
         while(true){
@@ -28,7 +33,33 @@ int main(int argc, char* argv[]){
                 }
                 exit(0);
             }
-            
+            if(parsed[0] == "cd"){
+                if(parsed.size() > 2){
+                    char error_message[30] = "An error has occurred\n";
+                    write(STDERR_FILENO, error_message, strlen(error_message));
+                }
+                if(parsed.size() == 1){
+                    char error_message[30] = "An error has occurred\n";
+                    write(STDERR_FILENO, error_message, strlen(error_message));
+                }else{
+                    int succ = chdir(parsed[1].c_str());
+                    if (succ == -1){
+                        char error_message[30] = "An error has occurred\n";
+                        write(STDERR_FILENO, error_message, strlen(error_message));
+                    }
+                }
+            }
+            if(parsed[0] == "path"){
+                //parse path
+                for(int i = 1; i < parsed.size(); i++){
+                    paths.push_back(parsed[i]);
+                }
+                //print path
+                for(int i = 0; i < paths.size(); i++){
+                    cout << paths[i] << endl;
+                }
+                
+            }
 
 
         }
