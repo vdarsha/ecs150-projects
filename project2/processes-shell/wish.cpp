@@ -13,9 +13,26 @@ int main(int argc, char* argv[]){
     if(argc == 1){
         //no arguments, boot into interactive mode
         while(true){
+            cout << "wish> ";
+            string input;
+            getline(cin, input);
+            stringstream ss(input);
+            vector<string> parsed;
+            while(getline(ss, input, ' ')){
+                parsed.push_back(input);
+            }
+            if(parsed[0] == "exit"){
+                if(parsed.size() > 1){
+                    char error_message[30] = "An error has occurred\n";
+                    write(STDERR_FILENO, error_message, strlen(error_message));
+                }
+                exit(0);
+            }
+            
+
 
         }
-    }else{
+    }else if(argc == 2){
         //batch mode
         string batch = argv[1];
         int commands = open(batch.c_str(), O_RDONLY);
@@ -25,5 +42,12 @@ int main(int argc, char* argv[]){
             exit(1);
         }
         char buffer[1024];
+        
+        
+    }else{
+        //too many arguments
+        char error_message[30] = "An error has occurred\n";
+        write(STDERR_FILENO, error_message, strlen(error_message));
+        exit(1);
     }
 }
