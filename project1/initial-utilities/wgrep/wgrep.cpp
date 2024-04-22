@@ -29,15 +29,15 @@ int main(int argc, char *argv[]) {
             int bytesread = read(verify, buffer, sizeof(buffer));
             string bufferst = "";
             while (bytesread > 0) {
-            bufferst += buffer[0];
-            if(buffer[0] == '\n'){
-                if(bufferst.find(searchterm) != string::npos){
-                    write(STDOUT_FILENO, bufferst.c_str(), bufferst.size());
+                bufferst += buffer[0];
+                if(buffer[0] == '\n'){
+                    if(bufferst.find(searchterm) != string::npos){
+                        write(STDOUT_FILENO, bufferst.c_str(), bufferst.size());
+                    }
+                    bufferst = "";
                 }
-                bufferst = "";
+                bytesread = read(verify, buffer, sizeof(buffer));
             }
-            bytesread = read(verify, buffer, sizeof(buffer));
-        }
             // close the file
             verify = close(verify);
         }
