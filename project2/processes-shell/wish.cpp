@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 
+
 using namespace std;
 
 
@@ -20,11 +21,18 @@ int main(int argc, char* argv[]){
             cout << "wish> ";
             string input;
             getline(cin, input);
-            stringstream ss(input);
             vector<string> parsed;
-            while(getline(ss, input, ' ')){
-                parsed.push_back(input);
+            int start, end;
+            start = end = 0;
+            char dl = ' ';
+            while ((start = input.find_first_not_of(dl, end))!= string::npos) {
+                end = input.find(dl, start);
+                parsed.push_back(input.substr(start, end - start));
             }
+            for(int i = 0; i < parsed.size(); i++){
+                cout << parsed[i] << endl;
+            }
+            
             if(parsed[0] == "exit"){
                 if(parsed.size() > 1){
                     char error_message[30] = "An error has occurred\n";
