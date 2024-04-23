@@ -87,7 +87,7 @@ int main(int argc, char* argv[]){
                     int pid = fork();
                     if(pid == 0){
                         int ex = execv(command.c_str(), args);
-                        if(ex != NULL){
+                        if(ex == -1){
                             char error_message[30] = "An error has occurred\n";
                             write(STDERR_FILENO, error_message, strlen(error_message));
                         }
