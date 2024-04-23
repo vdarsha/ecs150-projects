@@ -86,7 +86,11 @@ int main(int argc, char* argv[]){
                     args[parsed.size()] = NULL;
                     int pid = fork();
                     if(pid == 0){
-                        execv(command.c_str(), args);
+                        int ex = execv(command.c_str(), args);
+                        if(ex != NULL){
+                            char error_message[30] = "An error has occurred\n";
+                            write(STDERR_FILENO, error_message, strlen(error_message));
+                        }
                     }else{
                         wait(&pid);
                     }
@@ -155,7 +159,7 @@ int main(int argc, char* argv[]){
                 
             }
             
-
+            bytesread = read(commands, buffer, 1);
         }
         
         
