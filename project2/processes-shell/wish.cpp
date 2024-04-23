@@ -35,10 +35,10 @@ int main(int argc, char* argv[]){
                 }
             }
             vector <string> parallelcommands;
-            int ppid = getpid();
-            for(int i = 0; i <= paralleltokens.size(); i++){
+            // int ppid = getpid();
+            // for(int i = 0; i <= paralleltokens.size(); i++){
                 
-            }
+            // }
             if(parsed[0] == "exit"){
                 if(parsed.size() > 1){
                     char error_message[30] = "An error has occurred\n";
@@ -68,7 +68,32 @@ int main(int argc, char* argv[]){
                     paths.push_back(parsed[i]);
                 }
             }else{
-                
+                bool found = false;
+                string command = "";
+                for(int p = 0; p < paths.size(); p++){
+                    command = paths[p] + "/" + parsed[0];
+                    int succ = access(command.c_str(), X_OK);
+                    if(succ == 0){
+                        found = true;
+                        break;
+                    }
+                }
+                if(found){
+                    char *args[parsed.size() + 1];
+                    for(int i = 0; i < parsed.size(); i++){
+                        args[i] = (char*)parsed[i].c_str();
+                    }
+                    args[parsed.size()] = NULL;
+                    int pid = fork();
+                    if(pid == 0){
+                        execv(command.c_str(), args);
+                    }else{
+                        wait(&pid);
+                    }
+                }else{
+                    char error_message[30] = "An error has occurred\n";
+                    write(STDERR_FILENO, error_message, strlen(error_message));
+                }
             }
 
 
@@ -87,15 +112,16 @@ int main(int argc, char* argv[]){
         string bufferst = "";
         vector <string> parsed;
         while(bytesread > 0){
-            while(bytesread != 0 && buffer[0] != '\n'){
+            while(bytesread > 0 && buffer[0] != '\n'){
                 if(buffer[0] != ' '){
                     bufferst += buffer[0];
                 }
-                bytesread = read(commands, buffer, 1);
                 if(buffer[0] == ' '){
                     parsed.push_back(bufferst);
                     bufferst = "";
                 }
+                bytesread = read(commands, buffer, 1);
+                
             }
             if(parsed[0] == "exit"){
                 if(parsed.size() > 1){
@@ -108,7 +134,7 @@ int main(int argc, char* argv[]){
                     char error_message[30] = "An error has occurred\n";
                     write(STDERR_FILENO, error_message, strlen(error_message));
                 }
-                if(parsed.size() == 1){
+                else if(parsed.size() == 1){
                     char error_message[30] = "An error has occurred\n";
                     write(STDERR_FILENO, error_message, strlen(error_message));
                 }else{
