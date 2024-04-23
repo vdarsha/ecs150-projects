@@ -96,8 +96,8 @@ int main(int argc, char* argv[]){
         }
     }else if(argc == 2){
         //batch mode
-        istream* in = new ifstream(argv[1])
-        if (in->fail() {
+        istream* in = new ifstream(argv[1]);
+        if (in->fail()) {
             char error_message[30] = "An error has occurred\n";
             write(STDERR_FILENO, error_message, strlen(error_message));
             exit(1);
