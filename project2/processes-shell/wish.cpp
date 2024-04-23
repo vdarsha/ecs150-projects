@@ -116,50 +116,52 @@ int main(int argc, char* argv[]){
         string bufferst = "";
         vector <string> parsed;
         while(bytesread > 0){
-            while(bytesread > 0 && buffer[0] != '\n'){
-                if(buffer[0] != ' '){
-                    bufferst += buffer[0];
-                }
-                if(buffer[0] == ' '){
-                    parsed.push_back(bufferst);
-                    bufferst = "";
-                }
-                bytesread = read(commands, buffer, 1);
-                
+            
+            if(buffer[0] != ' '){
+                bufferst += buffer[0];
             }
-            if(parsed[0] == "exit"){
-                if(parsed.size() > 1){
-                    char error_message[30] = "An error has occurred\n";
-                    write(STDERR_FILENO, error_message, strlen(error_message));
-                }
-                exit(0);
-            }else if(parsed[0] == "cd"){
-                if(parsed.size() > 2){
-                    char error_message[30] = "An error has occurred\n";
-                    write(STDERR_FILENO, error_message, strlen(error_message));
-                }
-                else if(parsed.size() == 1){
-                    char error_message[30] = "An error has occurred\n";
-                    write(STDERR_FILENO, error_message, strlen(error_message));
-                }else{
-                    int succ = chdir(parsed[1].c_str());
-                    if (succ == -1){
+            if(buffer[0] == ' '){
+                parsed.push_back(bufferst);
+                bufferst = "";
+            }
+            bytesread = read(commands, buffer, 1);
+                
+            if(buffer[0] == '\n'){
+
+                if(parsed[0] == "exit"){
+                    if(parsed.size() > 1){
                         char error_message[30] = "An error has occurred\n";
                         write(STDERR_FILENO, error_message, strlen(error_message));
                     }
+                    exit(0);
+                }else if(parsed[0] == "cd"){
+                    if(parsed.size() > 2){
+                        char error_message[30] = "An error has occurred\n";
+                        write(STDERR_FILENO, error_message, strlen(error_message));
+                    }
+                    else if(parsed.size() == 1){
+                        char error_message[30] = "An error has occurred\n";
+                        write(STDERR_FILENO, error_message, strlen(error_message));
+                    }else{
+                        int succ = chdir(parsed[1].c_str());
+                        if (succ == -1){
+                            char error_message[30] = "An error has occurred\n";
+                            write(STDERR_FILENO, error_message, strlen(error_message));
+                        }
+                    }
+                }else if(parsed[0] == "path"){
+                    //delete old paths
+                    paths.clear();
+                    //parse path
+                    for(int i = 1; i < parsed.size(); i++){
+                        paths.push_back(parsed[i]);
+                    }
+                }else{
+                    
                 }
-            }else if(parsed[0] == "path"){
-                //delete old paths
-                paths.clear();
-                //parse path
-                for(int i = 1; i < parsed.size(); i++){
-                    paths.push_back(parsed[i]);
-                }
-            }else{
-                
-            }
             
-            bytesread = read(commands, buffer, 1);
+                bytesread = read(commands, buffer, 1);
+            }
         }
         
         
