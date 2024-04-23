@@ -1,14 +1,16 @@
-#include <stdio.h>
 #include <iostream>
-#include <iomanip>
-#include <string>
-#include <vector>
-#include <fcntl.h>
 #include <unistd.h>
-#include <sys/types.h>
-
+#include <sys/wait.h>
+#include <cstring>
+#include <vector>
+#include <sstream>
+#include <fstream>
+#include <cstdlib>
+#include <errno.h>
+#include <fcntl.h>
 
 using namespace std;
+
 
 
 int main(int argc, char* argv[]){
@@ -28,17 +30,7 @@ int main(int argc, char* argv[]){
                 end = input.find(dl, start);
                 parsed.push_back(input.substr(start, end - start));
             }
-            vector <int> paralleltokens;
-            for (int i = 0; i < parsed.size(); i++) {
-                if(parsed[i] == "&"){
-                    paralleltokens.push_back(i);
-                }
-            }
-            vector <string> parallelcommands;
-            // int ppid = getpid();
-            // for(int i = 0; i <= paralleltokens.size(); i++){
-                
-            // }
+
             if(parsed[0] == "exit"){
                 if(parsed.size() > 1){
                     char error_message[30] = "An error has occurred\n";
@@ -104,30 +96,56 @@ int main(int argc, char* argv[]){
         }
     }else if(argc == 2){
         //batch mode
-        string batch = argv[1];
-        int commands = open(batch.c_str(), O_RDONLY);
-        if(commands == -1){
+        istream* in = new ifstream(argv[1])
+        if (in->fail() {
             char error_message[30] = "An error has occurred\n";
             write(STDERR_FILENO, error_message, strlen(error_message));
             exit(1);
         }
-        char buffer[1];
-        int bytesread = read(commands, buffer, 1);
-        string bufferst = "";
-        vector <string> parsed;
-        while(bytesread > 0){
-            
-            if(buffer[0] != ' '){
-                bufferst += buffer[0];
+        if(!getline(*in, line)){
+            break;
+        }
+        std::istringstream ss(line);
+        std::vector<pid_t> children;
+        string command = "";
+        while(getline(ss, command, '&')){
+            isstringstream ss2(command);
+            vector<string> parsed;
+            string arg;
+            string outputloc = "";
+            bool err = false;
+            while (ss2 >> arg) {
+                if(arg.find(">") != string::npos ){
+                    size_t pos = arg.find(">");
+                    if(pos != 0){
+                        args.push_back(arg.substr(0, pos));
+                    }
+                    outputloc = arg.substr(pos + 1);
+                    if(outputloc.empty() && !(ss2 >> outputFile)){
+                        char error_message[30] = "An error has occurred\n";
+                        write(STDERR_FILENO, error_message, strlen(error_message));
+                        err = true;
+                        break;
+                    }
+                    if(ss2 >> arg){
+                        char error_message[30] = "An error has occurred\n";
+                        write(STDERR_FILENO, error_message, strlen(error_message));
+                        err = true;
+                        break;
+                    }
+                    break;
+                }
+                parsed.push_back(arg);
             }
-            if(buffer[0] == ' '){
-                parsed.push_back(bufferst);
-                bufferst = "";
+            if (parsed.empty() && !outputloc.empty()){
+                char error_message[30] = "An error has occurred\n";
+                write(STDERR_FILENO, error_message, strlen(error_message));
+                err = true;
             }
-            bytesread = read(commands, buffer, 1);
-                
-            if(buffer[0] == '\n'){
-
+            if (err){
+                continue;
+            }
+            if(!parsed.empty()){
                 if(parsed[0] == "exit"){
                     if(parsed.size() > 1){
                         char error_message[30] = "An error has occurred\n";
@@ -157,11 +175,58 @@ int main(int argc, char* argv[]){
                         paths.push_back(parsed[i]);
                     }
                 }else{
-                    
+                    pid_t pid = fork();
+                    if(pid == 0){
+                        bool found = false;
+                        string command = "";
+                        for(int p = 0; p < paths.size(); p++){
+                            command = paths[p] + "/" + parsed[0];
+                            int succ = access(command.c_str(), X_OK);
+                            if(succ == 0){
+                                found = true;
+                                break;
+                            }
+                        }
+                        char *args[parsed.size() + 1];
+                        for(int i = 0; i < parsed.size(); i++){
+                            args[i] = (char*)parsed[i].c_str();
+                        }
+                        argv[parsed.size()] = NULL;
+                        if(found){
+                            if(!outputloc.empty()){
+                                int fd = open(outputloc.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                                if(fd == -1){
+                                    char error_message[30] = "An error has occurred\n";
+                                    write(STDERR_FILENO, error_message, strlen(error_message));
+                                    exit(1);
+                                }
+                                dup2(fd, STDOUT_FILENO);
+                                dup2(fd, STDERR_FILENO);
+                                close(fd);
+                            }
+                            
+                            int ex = execv(command.c_str(), args);
+                            if(ex == -1){
+                                char error_message[30] = "An error has occurred\n";
+                                write(STDERR_FILENO, error_message, strlen(error_message));
+                            }
+
+                        }
+                    }else if(pid > 0){
+                        children.push_back(pid);
+
+                    }else{
+                        char error_message[30] = "An error has occurred\n";
+                        write(STDERR_FILENO, error_message, strlen(error_message));
+                    }
                 }
-            
-                bytesread = read(commands, buffer, 1);
             }
+
+            
+        }
+        for (std::vector<pid_t>::iterator it = children.begin(); it != children.end(); ++it) {
+            int status;
+            waitpid(*it, &status, 0);
         }
         
         
@@ -171,4 +236,5 @@ int main(int argc, char* argv[]){
         write(STDERR_FILENO, error_message, strlen(error_message));
         exit(1);
     }
+    return 0;
 }
