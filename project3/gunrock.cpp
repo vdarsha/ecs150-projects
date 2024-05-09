@@ -3,6 +3,10 @@
 #include <assert.h>
 #include <signal.h>
 #include <fcntl.h>
+#include <cstdlib>
+#include <errno.h>
+
+
 
 #include <iostream>
 #include <memory>
@@ -10,6 +14,13 @@
 #include <vector>
 #include <sstream>
 #include <deque>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+
+
+
+
 
 #include "HTTPRequest.h"
 #include "HTTPResponse.h"
@@ -149,6 +160,9 @@ int main(int argc, char *argv[]) {
     sync_print("waiting_to_accept", "");
     client = server->accept();
     sync_print("client_accepted", "");
+    for(int i = 0; i < THREAD_POOL_SIZE; i++){
+      
+    }
     handle_request(client);
   }
 }
