@@ -20,6 +20,11 @@ int main(int argc, char *argv[]) {
   super_t super;
   LocalFileSystem *lfs = new LocalFileSystem(disk);
   lfs->readSuperBlock(&super);
+  int inodemap[UFS_BLOCK_SIZE*super.inode_bitmap_len];
+  for(int i = 0; i < super.inode_bitmap_len; i++) {
+    disk->readBlock(super.inode_bitmap_addr + i,  &inodemap[i*UFS_BLOCK_SIZE]);
+  }
+  
 
   cout << "Super" << endl;
   cout << "inode_region_addr " << super.inode_region_addr << endl;
@@ -28,8 +33,6 @@ int main(int argc, char *argv[]) {
 
   cout << "Inode bitmap" << endl;
   for(int i = 0; i < super.inode_bitmap_len; i++) {
-    
-
-   //cout << (unsigned int) super.bitmap[i] << " ";
+   cout << (unsigned int)  &inodemap[i]<< " ";
   }
 }

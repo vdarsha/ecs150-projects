@@ -14,7 +14,8 @@ LocalFileSystem::LocalFileSystem(Disk *disk) {
 }
 
 void LocalFileSystem::readSuperBlock(super_t *super) {
-
+  disk->readBlock(0, super);
+  
 }
 
 int LocalFileSystem::lookup(int parentInodeNumber, string name) {
