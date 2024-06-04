@@ -145,10 +145,12 @@ class LocalFileSystem {
 
   // Helper functions, you should read/write the entire inode and bitmap regions
   void readInodeBitmap(super_t *super, unsigned char *inodeBitmap);
-  void writeInodeBitmap(super_t *super, unsigned char *inodeBitmap);
-  void readDataBitmap(super_t *super, unsigned char *dataBitmap);
-  void writeDataBitmap(super_t *super, unsigned char *dataBitmap);
   void readInodeRegion(super_t *super, inode_t *inodes);
+  void readDataBitmap(super_t *super, unsigned char *dataBitmap);
+  void writeInodeBitmap(super_t *super, unsigned char *inodeBitmap);
+  
+  void writeDataBitmap(super_t *super, unsigned char *dataBitmap);
+  
   void writeInodeRegion(super_t *super, inode_t *inodes);
 
   // Normally we'd mark this as private but we expose it so that you can access

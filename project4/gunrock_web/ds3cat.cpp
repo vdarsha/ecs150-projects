@@ -25,6 +25,14 @@ int main(int argc, char *argv[]) {
   int x = atoi(argv[2]);
   
   lfs.stat(x, &inode);
+  cout << "File blocks\n";
+  int datasize = inode.size/UFS_BLOCK_SIZE;
+  if(inode.size % UFS_BLOCK_SIZE != 0){
+    datasize++;
+  }
+  for(int i = 0; i < datasize; i++){
+    cout << inode.direct[i] << '\n';
+  }
   lfs.read(x, &file, inode.size);
   cout << "File data\n";
   cout << file << '\n';
