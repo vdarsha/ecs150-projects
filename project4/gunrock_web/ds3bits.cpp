@@ -16,14 +16,15 @@ int main(int argc, char *argv[]) {
     return 1;
   }
   //super_t super;
-  Disk *disk = new Disk(argv[1], UFS_BLOCK_SIZE);
+  Disk disk = Disk(argv[1], UFS_BLOCK_SIZE);
   super_t super;
-  LocalFileSystem *lfs = new LocalFileSystem(disk);
-  lfs->readSuperBlock(&super);
-  int inodemap[UFS_BLOCK_SIZE*super.inode_bitmap_len];
-  for(int i = 0; i < super.inode_bitmap_len; i++) {
-    disk->readBlock(super.inode_bitmap_addr + i,  &inodemap[i*UFS_BLOCK_SIZE]);
-  }
+  LocalFileSystem lfs = LocalFileSystem(&disk);
+  lfs.readSuperBlock(&super);
+  unsigned char inodemap[UFS_BLOCK_SIZE * super.inode_bitmap_len];
+  unsigned char datamap[UFS_BLOCK_SIZE * super.data_bitmap_len];
+
+  lfs.readInodeBitmap(&super, inodemap);
+  lfs.readDataBitmap(&super, datamap);
   
 
   cout << "Super" << endl;
@@ -31,8 +32,15 @@ int main(int argc, char *argv[]) {
   cout << "data_region_addr " << super.data_region_addr << endl;
   cout << endl;
 
-  cout << "Inode bitmap" << endl;
-  for(int i = 0; i < super.inode_bitmap_len; i++) {
-   cout << (unsigned int)  &inodemap[i]<< " ";
+  cout << "Inode bitmap\n";
+  for(int i = 0; i < super.inode_bitmap_len*UFS_BLOCK_SIZE; i++) {
+   cout << (unsigned int)  inodemap[i]<< " ";
   }
+  cout << "\n\n";
+
+  cout << "Data bitmap\n";
+  for(int i = 0; i < super.data_bitmap_len*UFS_BLOCK_SIZE; i++) {
+   cout << (unsigned int)  datamap[i]<< " ";
+  }
+  cout << '\n';
 }
