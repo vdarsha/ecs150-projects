@@ -2,6 +2,7 @@
 #define _LOCAL_FILE_SYSTEM_H_
 
 #include <string>
+#include <cstring>
 
 #include "Disk.h"
 #include "ufs.h"

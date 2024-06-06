@@ -1,6 +1,6 @@
 all: gunrock_web mkfs ds3ls ds3cat ds3bits
 
-CC = g++
+CC = g++ -std=c++11
 CFLAGS = -g -Werror -Wall -I include -I shared/include -I/usr/local/opt/openssl@1.1/include -I/opt/homebrew/Cellar/openssl@3/3.2.1/include
 LDFLAGS = -L /opt/homebrew/Cellar/openssl@3/3.2.1/lib -lssl -lcrypto -pthread
 VPATH = shared

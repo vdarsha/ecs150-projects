@@ -21,10 +21,13 @@ int main(int argc, char *argv[]) {
   lfs.readSuperBlock(&super);
   inode_t inode;
   
-  char file[MAX_FILE_SIZE];
+  char file[inode.size];
   int x = atoi(argv[2]);
   
-  lfs.stat(x, &inode);
+  if(lfs.stat(x, &inode) != 0) {
+    cout << "Invalid inode number " << x << endl;
+    return -1;
+  }
   cout << "File blocks\n";
   int datasize = inode.size/UFS_BLOCK_SIZE;
   if(inode.size % UFS_BLOCK_SIZE != 0){
@@ -33,9 +36,11 @@ int main(int argc, char *argv[]) {
   for(int i = 0; i < datasize; i++){
     cout << inode.direct[i] << '\n';
   }
+  cout << "\n";
   lfs.read(x, &file, inode.size);
+
   cout << "File data\n";
-  cout << file << '\n';
+  cout << file << "\n";
   return 0;
 
 
