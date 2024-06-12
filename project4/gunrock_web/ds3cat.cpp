@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   lfs.readSuperBlock(&super);
   inode_t inode;
   
-  char file[inode.size];
+  unsigned char file[inode.size];
   int x = atoi(argv[2]);
   
   if(lfs.stat(x, &inode) != 0) {
@@ -37,11 +37,44 @@ int main(int argc, char *argv[]) {
     cout << inode.direct[i] << '\n';
   }
   cout << "\n";
-  lfs.read(x, &file, inode.size);
+  lfs.read(x, file, inode.size);
 
   cout << "File data\n";
-  cout << file << "\n";
+  cout << file;
+
+
+  // write testing
+
+  // int bytesWritten = lfs.write(x, file, inode.size + 1);
+
+  // if (bytesWritten >= 0) {
+  //     // Write successful
+  //     cout << "Bytes written: " << bytesWritten << endl;
+  // } else {
+  //     // Write failed, handle the error
+  //     switch (bytesWritten) {
+  //         case -EINVALIDINODE:
+  //             cout << "Error: Invalid inode number." << endl;
+  //             break;
+  //         case -EINVALIDTYPE:
+  //             cout << "Error: Not a regular file." << endl;
+  //             break;
+  //         case -EINVALIDSIZE:
+  //             cout << "Error: Invalid size." << endl;
+  //             break;
+  //         case -ENOTENOUGHSPACE:
+  //             cout << "Error: Not enough space." << endl;
+  //             break;
+  //         // Handle other possible error codes...
+  //         default:
+  //             cout << "Error: Unknown error occurred." << endl;
+  //     }
+  // }
+
   return 0;
+
+
+  
 
 
   

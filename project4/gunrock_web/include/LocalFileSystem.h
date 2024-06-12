@@ -154,6 +154,8 @@ class LocalFileSystem {
   
   void writeInodeRegion(super_t *super, inode_t *inodes);
 
+  
+
   // Normally we'd mark this as private but we expose it so that you can access
   // it in a function you add that is not part of the LocalFileSystem object but
   // can still access the disk.
